@@ -1,8 +1,4 @@
-import scalaj.http._
-import argonaut._
-import Argonaut._
-import utils.APICaller
-
+package utils
 
 object PrettyPrint extends App {
 

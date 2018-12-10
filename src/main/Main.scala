@@ -1,5 +1,7 @@
-/* import scalaj.http._
+package main
+
 import argonaut._, Argonaut._
+import scalaj.http.{Http, HttpResponse}
 
 object Main extends App {
 
@@ -12,4 +14,3 @@ object Main extends App {
     println(pretty.asJson.spaces4)
   }
 }
-*/
