@@ -1,16 +1,17 @@
 package main
 
-import argonaut._, Argonaut._
+import argonaut._
+import Argonaut._
 import scalaj.http.{Http, HttpResponse}
+import utils.{APICaller, PrettyPrint}
+
+import scala.collection.mutable.Queue
 
 object Main extends App {
 
   override def main(args: Array[String]): Unit = {
-
-    val response: HttpResponse[String] = Http("https://mastodon.social/api/v1/instance").asString
-    val obj:Option[Json] = Parse.parseOption(response.body)
-    var pretty = obj.get
-    if (obj.get == null) println("No Response") else pretty = obj.get
-    println(pretty.asJson.spaces4)
+    var ac:APICaller = new APICaller
+    val cleaner:PrettyPrint = new PrettyPrint
+    ac.manageStream(cleaner)
   }
 }

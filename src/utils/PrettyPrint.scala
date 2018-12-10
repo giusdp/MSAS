@@ -1,9 +1,29 @@
 package utils
 
-object PrettyPrint extends App {
+import argonaut._ , Argonaut._
 
-  override def main(args: Array[String]): Unit = {
-    var ac:APICaller = new APICaller
-    ac.manageStream()
+class PrettyPrint {
+
+  def cleanString(rawString:String):Option[String] = rawString match {
+
+    case s if s.startsWith("event") => None
+    case s if s.startsWith("data") => Some(s.substring(6, s.length))
+    case _ => None
+
   }
+
+  def takeText(filteredString:Option[String]) = filteredString match {
+    case None => null
+    case Some(s) => {
+      val obj: Option[Json] = Parse.parseOption(s)
+      var pretty = obj.orNull
+      if (pretty == null) println("Parsed string failed: " + s) else filteredJson(pretty)
+    }
+  }
+
+  def filteredJson(retrieved:Json) = {
+    println(retrieved.fieldOrNull("content"))
+  }
+
 }
+
