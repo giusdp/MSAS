@@ -12,17 +12,16 @@ class PrettyPrint {
 
   }
 
-  def takeText(filteredString:Option[String]) = filteredString match {
+  def takeText(filteredString:Option[String]): String = filteredString match {
     case None => null
-    case Some(s) => {
+    case Some(s) =>
       val obj: Option[Json] = Parse.parseOption(s)
       var pretty = obj.orNull
-      if (pretty == null) println("Parsed string failed: " + s) else filteredJson(pretty)
-    }
+      if (pretty == null) "Parsed string failed: " + s else filteredJson(pretty)
   }
 
-  def filteredJson(retrieved:Json) = {
-    println(retrieved.fieldOrNull("content"))
+  def filteredJson(retrieved:Json) : String = {
+    retrieved.fieldOrNull("content").toString()
   }
 
 }
