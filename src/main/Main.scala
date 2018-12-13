@@ -3,7 +3,7 @@ package main
 import argonaut._
 import Argonaut._
 import scalaj.http.{Http, HttpResponse}
-import utils.{APICaller, PrettyPrint}
+import utils.{APICaller, StatusExtractor}
 
 import scala.collection.mutable.Queue
 

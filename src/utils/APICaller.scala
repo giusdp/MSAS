@@ -13,7 +13,7 @@ class APICaller {
 
   var socket: RedirectSocket = _
 
-  def manageMastodonStream(cleaner: PrettyPrint): Unit = {
+  def manageMastodonStream(cleaner: StatusExtractor): Unit = {
     if (socket == null) throw new Exception("Connection was not opened (RedirectSocket is null)")
 
 
@@ -22,7 +22,8 @@ class APICaller {
         val request = Http(baseURL + endpoint)
         request.execute(is => {
           scala.io.Source.fromInputStream(is).getLines.foreach(e => {
-            socket.send(cleaner.takeText(cleaner.cleanString(e)))
+            val status = cleaner.takeText(cleaner.cleanString(e))
+            if (status != null) socket.send(status)
           })
         })
       } catch {
