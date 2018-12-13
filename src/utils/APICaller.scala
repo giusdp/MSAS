@@ -16,7 +16,6 @@ class APICaller {
   def manageStream(cleaner: PrettyPrint): Unit = {
     if (socket == null) throw new Exception("Connection was not opened (RedirectSocket is null)")
 
-    socket.start()
 
     while (true) {
       try {
@@ -36,6 +35,7 @@ class APICaller {
 
   def openConnection(): Unit = {
     socket = new RedirectSocket()
+    socket.start()
   }
 
   def closeConnection(): Unit = {

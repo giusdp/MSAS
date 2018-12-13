@@ -6,10 +6,10 @@ import java.net.{ServerSocket, Socket}
 class RedirectSocket {
 
     var serverSocket: ServerSocket = _
-    var clientSocket : Socket = _
-    var out : PrintWriter = _
-    var in : BufferedReader = _
-    var cAddress : String = _
+    var clientSocket: Socket = _
+    var out: PrintWriter = _
+    var in: BufferedReader = _
+    var cAddress: String = _
 
     def start(): Unit = {
       serverSocket = new ServerSocket(37644)
@@ -19,7 +19,7 @@ class RedirectSocket {
       cAddress = clientSocket.getInetAddress.toString
     }
 
-    def send(data: String) : Unit = {
+    def send(data: String): Unit = {
       out.println(data)
     }
 
@@ -30,4 +30,5 @@ class RedirectSocket {
       serverSocket.close()
     }
 
+  }
 }
