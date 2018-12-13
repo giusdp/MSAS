@@ -6,10 +6,10 @@ import scalaj.http.Http
 
 class APICaller {
 
-  val baseURL: String = "https://mastodon.technology"
+  val baseURL: String = "https://mastodon.technology" // TODO: change in twitter
   val endpoint: String = "/api/v1/streaming/public"
-  val token: String = "9ae77419135fc815ec25c3d16b4ed9ca1cf440fa3119c0fa9f68e4341df5ff46"
-  val url: String = baseURL + endpoint + "?access_token=" + token + "&stream=public"
+//  val token: String = "9ae77419135fc815ec25c3d16b4ed9ca1cf440fa3119c0fa9f68e4341df5ff46"
+//  val url: String = baseURL + endpoint + "?access_token=" + token + "&stream=public"
 
   var socket: RedirectSocket = _
 
