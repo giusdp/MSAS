@@ -20,8 +20,9 @@ class PrettyPrint {
       if (pretty == null) "Parsed string failed: " + s else filteredJson(pretty)
   }
 
-  def filteredJson(retrieved:Json) : String = {
-    retrieved.fieldOrNull("content").toString()
+  def filteredJson(retrieved:Json) : String = retrieved.fieldOrNull("content") match {
+    case null => ""
+    case s => s.toString()
   }
 
 }

@@ -10,7 +10,7 @@ import scala.collection.mutable.Queue
 object Main extends App {
 
   override def main(args: Array[String]): Unit = {
-    var sparkTry = new SparkStreaming
+    val sparkTry = new SparkStreaming()
     sparkTry.startStreaming()
   }
 }

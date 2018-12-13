@@ -9,22 +9,34 @@ import org.apache.spark.streaming._
 
 class SparkStreaming {
 
-  def startStreaming() = {
+  def startStreaming(): Unit = {
 
     val conf = new SparkConf().setMaster("local[2]").setAppName("MastodonStreaming")
     conf.setAppName("MSAS")
     conf.set("spark.eventLog.enabled", "true")
     conf.set("spark.eventLog.dir", "/tmp/spark-events")
     LogManager.getRootLogger.setLevel(Level.ALL)
-    System.setProperty("hadoop.home.dir", "/home/alessandro")
+    System.setProperty("hadoop.home.dir", "/home/giuseppe")
 
     val ssc = new StreamingContext(conf, Seconds(1))
-    val lines = ssc.socketTextStream("localhost", 37644)
-
     var ac: APICaller = new APICaller
+
     val cleaner: PrettyPrint = new PrettyPrint
     ac.openConnection()
-    ac.manageStream(cleaner)
+    //Thread.sleep(1000)
+
+    val lines = ssc.socketTextStream("localhost", 37644)
+
+    val words = lines.flatMap(_.split(" "))
+    val pairs = words.map( w => (w, 1))
+    val wordCounts = pairs.reduceByKey(_ + _)
+
+    words.print()
+
+    ssc.start()
+    ssc.awaitTerminationOrTimeout(10000)
+
+    ac.manageMastodonStream(cleaner)
     ac.closeConnection()
 
   }

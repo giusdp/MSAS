@@ -13,7 +13,7 @@ class APICaller {
 
   var socket: RedirectSocket = _
 
-  def manageStream(cleaner: PrettyPrint): Unit = {
+  def manageMastodonStream(cleaner: PrettyPrint): Unit = {
     if (socket == null) throw new Exception("Connection was not opened (RedirectSocket is null)")
 
 
