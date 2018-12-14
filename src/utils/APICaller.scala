@@ -13,7 +13,7 @@ class APICaller {
   val twitterUrl: String = "https://stream.twitter.com/1.1/statuses/filter.json?track=twitter"
 
 //  val token: String = "9ae77419135fc815ec25c3d16b4ed9ca1cf440fa3119c0fa9f68e4341df5ff46"
-//  val url: String = baseURL + endpoint + "?access_token=" + token + "&stream=public"
+//  val url: String = baseURL + endpoint + "?access_token Mastodon=" + token + "&stream=public"
 
   var socket: RedirectSocket = _
 
@@ -27,8 +27,9 @@ class APICaller {
         val request = Http(twitterUrl)
         request.execute(is => {
           scala.io.Source.fromInputStream(is).getLines.foreach(e => {
-            val status = cleaner.takeText(cleaner.cleanString(e))
-            if (status != null) socket.send(status)
+            println(e)
+            /*val status = cleaner.takeText(cleaner.cleanString(e))
+            if (status != null) socket.send(status)*/
           })
         })
       } catch {
