@@ -3,9 +3,7 @@ package main
 import org.apache.log4j.{Level, LogManager}
 import org.apache.spark._
 import org.apache.spark.streaming._
-import utils.{APICaller, StatusExtractor}
-
-//import org.apache.spark.streaming.StreamingContext._ // not necessary since Spark 1.3
+import utils.APICaller
 
 class SparkStreaming {
 
@@ -21,9 +19,7 @@ class SparkStreaming {
     val ssc = new StreamingContext(conf, Seconds(1))
     var ac: APICaller = new APICaller
 
-    val cleaner: StatusExtractor = new StatusExtractor
     ac.openConnection()
-    //Thread.sleep(1000)
 
     val lines = ssc.socketTextStream("localhost", 37644)
 
@@ -34,12 +30,11 @@ class SparkStreaming {
       println(c._2.toString)
     }))
 
-    //lines.foreachRDD(x => x.foreach(l => println(l)))
 
     ssc.start()
     ssc.awaitTerminationOrTimeout(10000)
 
-    ac.manageMastodonStream(cleaner)
+    ac.startTwitterStream()
     ac.closeConnection()
 
   }
