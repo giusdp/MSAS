@@ -9,15 +9,15 @@ class SparkStreaming {
 
   def startStreaming(): Unit = {
 
-    val conf = new SparkConf().setMaster("local[2]").setAppName("MastodonStreaming")
-    conf.setAppName("MSAS")
-    conf.set("spark.eventLog.enabled", "true")
-    conf.set("spark.eventLog.dir", "/tmp/spark-events")
+    val conf = new SparkConf().setMaster("local[2]")
+    conf.setAppName("TSAS")
+    //conf.set("spark.eventLog.enabled", "true")
+    //conf.set("spark.eventLog.dir", "/tmp/spark-events")
     LogManager.getRootLogger.setLevel(Level.OFF)
     System.setProperty("hadoop.home.dir", "/home/giuseppe")
 
     val ssc = new StreamingContext(conf, Seconds(1))
-    var ac: APICaller = new APICaller
+    val ac: APICaller = new APICaller
 
     ac.openConnection()
 

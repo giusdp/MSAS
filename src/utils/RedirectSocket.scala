@@ -18,9 +18,9 @@ class RedirectSocket {
     serverSocket = new ServerSocket(37644)
 
     creationThread = new Thread(() => {
-      println("REDIRECT SOCKET: Thread lanciato in parallelo. In attesa di clients...")
+      println("RedirectSocket: Thread lanciato in parallelo. In attesa di clients...")
       clientSocket = serverSocket.accept()
-      println("REDIRECT SOCKET: Clients accettato.")
+      println("RedirectSocket: Client accettato.")
       out = new PrintWriter(clientSocket.getOutputStream, true)
       in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream))
       cAddress = clientSocket.getInetAddress.toString
