@@ -10,4 +10,4 @@ libraryDependencies += "org.apache.spark" %% "spark-streaming" % "2.4.0"
 
 libraryDependencies += "edu.stanford.nlp" % "stanford-corenlp" % "3.5.2" artifacts (Artifact("stanford-corenlp", "models"), Artifact("stanford-corenlp"))
 
-libraryDependencies += "com.danielasfregola" %% "twitter4s" % "5.5"
+libraryDependencies += "com.danielasfregola" %% "twitter4s" % "5.5" 
