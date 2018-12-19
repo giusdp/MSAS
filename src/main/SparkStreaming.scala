@@ -14,7 +14,7 @@ class SparkStreaming {
     //conf.set("spark.eventLog.enabled", "true")
     //conf.set("spark.eventLog.dir", "/tmp/spark-events")
     LogManager.getRootLogger.setLevel(Level.OFF)
-    System.setProperty("hadoop.home.dir", "/home/giuseppe")
+    System.setProperty("hadoop.home.dir", "/home")
 
     val ssc = new StreamingContext(conf, Seconds(1))
     val ac: APICaller = new APICaller

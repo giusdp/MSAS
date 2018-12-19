@@ -6,8 +6,8 @@ import com.danielasfregola.twitter4s.entities.{AccessToken, ConsumerToken, Tweet
 
 class APICaller {
 
-  val consumerToken = ConsumerToken(key = "SaobWJCoaLTeQt2ZejDyp8Cqb", secret = "0U35QrWEM8o4ayWqnxUsvQO49DjTg0nkzNfaGHmo0kj3vJvLkT")
-  val accessToken = AccessToken(key = "1073564600312971266-d2R4xPHboqjBFq8GXyFolR1aQvM8R8", secret = "XLNzDjZZF1oT7lvyHhvKCa6qp5q2zjVwuIPqfISBhEAc7")
+  val consumerToken = ConsumerToken(key = "xQ75rk7rKYBLFOkWzLJRT8Bmq", secret = "svqY6LfIZSh3S7fI0AJ00vPzEvlecTH5zqkjNguuzGH1ZBKJ0X")
+  val accessToken = AccessToken(key = "1073564600312971266-EaLhIkkxb7w7gsLcBtLQcFJm3hj4RZ", secret = "kmjoN9Oc50jlBD2BHy3OyGLtCQMdLXYzg5w7WhRPgssAq")
   val streamingClient:TwitterStreamingClient = TwitterStreamingClient(consumerToken, accessToken)
   val tracking: Seq[String] = Seq("twitter")
 
@@ -18,9 +18,6 @@ class APICaller {
     streamingClient.filterStatuses(tracks = tracking)(processTweet)
 
     println("APICaller: Connection established with Twitter")
-    while (true) {
-      Thread.sleep(500)
-    }
   }
 
   def openConnection(): Unit = {
@@ -35,6 +32,7 @@ class APICaller {
 
   def processTweet: PartialFunction[CommonStreamingMessage, Unit] = {
     case tweet: Tweet => socket.send(tweet.text)
+    //case tweet: Tweet => println(tweet.text)
   }
 
 
