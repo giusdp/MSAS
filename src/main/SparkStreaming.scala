@@ -30,11 +30,14 @@ class SparkStreaming {
       println(c._2.toString)
     }))
 
-
     ssc.start()
     ssc.awaitTerminationOrTimeout(10000)
-
     ac.startTwitterStream()
+
+
+    while (true) {
+      Thread.sleep(500)
+    }
     ac.closeConnection()
 
   }

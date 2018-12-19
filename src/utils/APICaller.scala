@@ -6,10 +6,10 @@ import com.danielasfregola.twitter4s.entities.{AccessToken, ConsumerToken, Tweet
 
 class APICaller {
 
-  val consumerToken = ConsumerToken(key = "xQ75rk7rKYBLFOkWzLJRT8Bmq", secret = "svqY6LfIZSh3S7fI0AJ00vPzEvlecTH5zqkjNguuzGH1ZBKJ0X")
-  val accessToken = AccessToken(key = "1073564600312971266-EaLhIkkxb7w7gsLcBtLQcFJm3hj4RZ", secret = "kmjoN9Oc50jlBD2BHy3OyGLtCQMdLXYzg5w7WhRPgssAq")
+  val consumerToken = ConsumerToken(key = "9zAEZKIiGrofrdOdd9b8IYRzv", secret = "iUcWw9lg30UBshHOzXpnkwPJfL32IURcavHrmiwd4IupFncwaA")
+  val accessToken = AccessToken(key = "1073564600312971266-3feLqOewNenRpFwxRsfmR1BdWQ6FRq", secret = "gpF7yx6VuiulCri02Un1cN2Ac300YxnqoKJQMt9VHZugy")
   val streamingClient:TwitterStreamingClient = TwitterStreamingClient(consumerToken, accessToken)
-  val tracking: Seq[String] = Seq("twitter")
+  val tracking: Seq[String] = Seq("christmas")
 
   var socket: RedirectSocket = _
 
@@ -31,8 +31,8 @@ class APICaller {
   }
 
   def processTweet: PartialFunction[CommonStreamingMessage, Unit] = {
-    case tweet: Tweet => socket.send(tweet.text)
-    //case tweet: Tweet => println(tweet.text)
+    // case tweet: Tweet => socket.send(tweet.text)
+    case tweet: Tweet => println(tweet.text)
   }
 
 
