@@ -38,8 +38,8 @@ class APICaller {
     // case tweet: Tweet => socket.send(tweet.text)
     case tweet: Tweet =>
       if (!tweet.text.contains("https://") && !tweet.text.startsWith("RT") && tweet.lang.getOrElse("it").equals("en"))
-        println(tweet.text)
-    //socket.send(tweet.text)
+        // println(tweet.text)
+        socket.send(tweet.text)
   }
 
 
