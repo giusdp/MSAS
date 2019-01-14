@@ -1,12 +1,16 @@
 package main
 
+import java.util.concurrent.atomic.AtomicInteger
+
+import org.apache.commons.lang.mutable.Mutable
 import org.apache.spark._
 import org.apache.spark.streaming._
 import utils.APICaller
 import utils.SentimentProcessor
-
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+
+import scala.collection.mutable
 
 class SparkStreaming {
 
@@ -17,32 +21,43 @@ class SparkStreaming {
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
 
-    val sentimentPlotting = new SentimentProcessor
+    // val sentimentPlotting = new SentimentProcessor
+    // val sentimentCollection:mutable.Map[String, Int] = scala.collection.mutable.Map("POSITIVE" -> 0, "NEGATIVE" -> 0, "NEUTRAL" -> 0)
 
     val ssc = new StreamingContext(conf, Seconds(1))
     val ac: APICaller = new APICaller
+    val counter = List("POSITIVE" ->0, "NEGATIVE" -> 0, "NEUTRAL" ->0)
+    val sentimentCounter = ssc.sparkContext.parallelize(counter, 3)
 
     ac.openConnection()
 
-    val lines = ssc.socketTextStream("localhost", 37644)
+    val streamingSocket = ssc.socketTextStream("localhost", 37644)
 
-    val sentiments = lines.map(l => (l, SentimentAnalyzer.mainSentiment(l)))
+    val dstream = streamingSocket.map(tweet => SentimentAnalyzer.mainSentiment(tweet).toString -> tweet)
 
-    sentiments.foreachRDD(r => r.foreach( c => {
-      println(c._1)
-      println(c._2.toString)
+    dstream.foreachRDD(rdd => rdd.foreach(c => {
+        // Aggiornare i contatori
     }))
+    /*sentiments.foreachRDD(r => r.foreach( c => {
+      println(c._1)
+      val sentiment = c._2.toString
+      println(sentiment)
+      sentimentCollection.update(sentiment, sentimentCollection(sentiment) + 1)
+    }))*/
 
     ssc.start()
     ssc.awaitTerminationOrTimeout(10000)
     ac.startTwitterStream()
 
 
-    while (true) {
-      Thread.sleep(500)
-    }
+    Thread.sleep(20000)
+    streamingSocket.stop()
+    println(dstream)
+    ssc.stop(stopSparkContext = true, stopGracefully = true)
     ac.closeConnection()
 
+
+    // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
   }
 }
 
