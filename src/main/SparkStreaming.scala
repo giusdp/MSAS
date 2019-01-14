@@ -3,6 +3,7 @@ package main
 import org.apache.spark._
 import org.apache.spark.streaming._
 import utils.APICaller
+import utils.SentimentProcessor
 
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
@@ -15,6 +16,8 @@ class SparkStreaming {
     conf.setAppName("TSAS")
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
+
+    val sentimentPlotting = new SentimentProcessor
 
     val ssc = new StreamingContext(conf, Seconds(1))
     val ac: APICaller = new APICaller
