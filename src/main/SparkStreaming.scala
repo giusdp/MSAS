@@ -9,6 +9,7 @@ import utils.APICaller
 import utils.SentimentProcessor
 import org.apache.log4j.Logger
 import org.apache.log4j.Level
+import java.io._
 
 import scala.collection.mutable
 
@@ -30,6 +31,7 @@ class SparkStreaming {
     //
     val direct:mutable.Buffer[String] = mutable.Buffer[String]()
     val directPar = sparkStreamingContext.sparkContext.parallelize(direct)
+    val r = scala.util.Random
     //
     val sentimentCounter = sparkStreamingContext.sparkContext.parallelize(counter, 3)
 
@@ -39,8 +41,14 @@ class SparkStreaming {
 
     val dstream = streamingSocket.map(tweet => SentimentAnalyzer.mainSentiment(tweet).toString -> tweet)
 
-    dstream.foreachRDD(rdd =>
-      rdd.saveAsTextFile("StreamingFiles")
+    dstream.foreachRDD(rdd => rdd.foreach(c => {
+      if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
+        val file = new File("Sens/Sentiment" + r.nextInt(1000000000).toString)
+        val bw = new BufferedWriter(new FileWriter(file))
+        bw.write(c._1)
+        bw.close()
+      } else println("Empty RDD")
+    })
     )
     /*sentiments.foreachRDD(r => r.foreach( c => {
       println(c._1)
@@ -53,15 +61,11 @@ class SparkStreaming {
 
     sparkStreamingContext.start()
     apiCaller.startTwitterStream()
-    sparkStreamingContext.awaitTerminationOrTimeout(60000)
+    sparkStreamingContext.awaitTerminationOrTimeout(20000)
 
     //Thread.sleep(20000)
     streamingSocket.stop()
     apiCaller.closeConnection()
-
-    println("Saving files...")
-
-
 
     // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
     sparkStreamingContext.stop()
