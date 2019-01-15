@@ -24,26 +24,24 @@ class SparkStreaming {
     // val sentimentPlotting = new SentimentProcessor
     // val sentimentCollection:mutable.Map[String, Int] = scala.collection.mutable.Map("POSITIVE" -> 0, "NEGATIVE" -> 0, "NEUTRAL" -> 0)
 
-    val ssc = new StreamingContext(conf, Seconds(1))
-    val ac: APICaller = new APICaller
+    val sparkStreamingContext = new StreamingContext(conf, Seconds(1))
+    val apiCaller: APICaller = new APICaller
     val counter = List("POSITIVE" ->0, "NEGATIVE" -> 0, "NEUTRAL" ->0)
     //
     val direct:mutable.Buffer[String] = mutable.Buffer[String]()
-    val directPar = ssc.sparkContext.parallelize(direct)
+    val directPar = sparkStreamingContext.sparkContext.parallelize(direct)
     //
-    val sentimentCounter = ssc.sparkContext.parallelize(counter, 3)
+    val sentimentCounter = sparkStreamingContext.sparkContext.parallelize(counter, 3)
 
-    ac.openConnection()
+    apiCaller.openConnection()
 
-    val streamingSocket = ssc.socketTextStream("localhost", 37644)
+    val streamingSocket = sparkStreamingContext.socketTextStream("localhost", 37644)
 
     val dstream = streamingSocket.map(tweet => SentimentAnalyzer.mainSentiment(tweet).toString -> tweet)
 
-    dstream.foreachRDD(rdd => rdd.foreach(c => {
-        direct += c._1
-      println(c._1)
-      println(c._2)
-    }))
+    dstream.foreachRDD(rdd =>
+      rdd.saveAsTextFile("StreamingFiles")
+    )
     /*sentiments.foreachRDD(r => r.foreach( c => {
       println(c._1)
       val sentiment = c._2.toString
@@ -51,21 +49,23 @@ class SparkStreaming {
       sentimentCollection.update(sentiment, sentimentCollection(sentiment) + 1)
     }))*/
 
-    ssc.start()
-    ac.startTwitterStream()
-    ssc.awaitTerminationOrTimeout(20000)
+    //dstream.saveAsTextFiles("dstreamTwitter", "txt")
+
+    sparkStreamingContext.start()
+    apiCaller.startTwitterStream()
+    sparkStreamingContext.awaitTerminationOrTimeout(60000)
 
     //Thread.sleep(20000)
-    //ssc.stop()
-    println("Print direct par:")
-    direct.foreach(x => println(x))
-    println(direct.head)
+    streamingSocket.stop()
+    apiCaller.closeConnection()
 
-    ac.closeConnection()
-    println("Closed.")
+    println("Saving files...")
+
 
 
     // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
+    sparkStreamingContext.stop()
+    println("Done.")
   }
 }
 
