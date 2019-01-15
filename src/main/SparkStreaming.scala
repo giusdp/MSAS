@@ -27,6 +27,10 @@ class SparkStreaming {
     val ssc = new StreamingContext(conf, Seconds(1))
     val ac: APICaller = new APICaller
     val counter = List("POSITIVE" ->0, "NEGATIVE" -> 0, "NEUTRAL" ->0)
+    //
+    val direct:mutable.Buffer[String] = mutable.Buffer[String]()
+    val directPar = ssc.sparkContext.parallelize(direct)
+    //
     val sentimentCounter = ssc.sparkContext.parallelize(counter, 3)
 
     ac.openConnection()
@@ -36,7 +40,8 @@ class SparkStreaming {
     val dstream = streamingSocket.map(tweet => SentimentAnalyzer.mainSentiment(tweet).toString -> tweet)
 
     dstream.foreachRDD(rdd => rdd.foreach(c => {
-        // Aggiornare i contatori
+        directPar + c._1
+        // println(direct)
     }))
     /*sentiments.foreachRDD(r => r.foreach( c => {
       println(c._1)
@@ -46,15 +51,16 @@ class SparkStreaming {
     }))*/
 
     ssc.start()
-    ssc.awaitTerminationOrTimeout(10000)
+    ssc.awaitTermination
     ac.startTwitterStream()
 
 
+
     Thread.sleep(20000)
-    streamingSocket.stop()
-    println(dstream)
-    ssc.stop(stopSparkContext = true, stopGracefully = true)
+    ssc.stop()
     ac.closeConnection()
+    println("elem")
+    directPar.foreach(x => println(x))
 
 
     // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
