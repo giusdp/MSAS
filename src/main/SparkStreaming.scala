@@ -13,7 +13,7 @@ class SparkStreaming {
 
   def startStreaming(): Unit = {
 
-    val tracking: Seq[String] = Seq("NATO")
+    val tracking: Seq[String] = Seq("TuesdayThoughts")
     val d = new File("Sens/" + tracking.head)
     if (!(d.exists && d.isDirectory)) {
       if(d.mkdir()) println("Directory " + tracking.head + " created!")

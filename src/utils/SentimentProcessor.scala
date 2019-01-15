@@ -36,9 +36,9 @@ class SentimentProcessor  {
     ds.addValue(sentiments("NEGATIVE"), "Negatives", "Negatives")
 
     val chart = ChartFactories.BarChart(ds)
-    chart.title = "Tweets about: " + hashtag
+    chart.title = sentiments.foldLeft(0)(_+_._2) + " tweets about: " + hashtag
     //chart.show()
-    chart.saveAsPNG("Charts/" + hashtag+".png")
+    chart.saveAsPNG( "Charts/" + hashtag + ".png")
 
   }
 }
