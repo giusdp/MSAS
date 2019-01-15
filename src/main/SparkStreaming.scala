@@ -17,6 +17,12 @@ class SparkStreaming {
 
   def startStreaming(): Unit = {
 
+    val tracking: Seq[String] = Seq("NATO")
+    val d = new File("Sens/" + tracking.head)
+    if (!(d.exists && d.isDirectory)) {
+      if(d.mkdir()) println("Directory " + tracking.head + " created!")
+    }
+
     val conf = new SparkConf().setMaster("local[2]")
     conf.setAppName("TSAS")
     Logger.getLogger("org").setLevel(Level.OFF)
@@ -43,7 +49,7 @@ class SparkStreaming {
 
     dstream.foreachRDD(rdd => rdd.foreach(c => {
       if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
-        val file = new File("Sens/Sentiment" + r.nextInt(1000000000).toString)
+        val file = new File("Sens/" + tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(c._1)
         bw.close()
@@ -60,8 +66,8 @@ class SparkStreaming {
     //dstream.saveAsTextFiles("dstreamTwitter", "txt")
 
     sparkStreamingContext.start()
-    apiCaller.startTwitterStream()
-    sparkStreamingContext.awaitTerminationOrTimeout(20000)
+    apiCaller.startTwitterStream(tracking)
+    sparkStreamingContext.awaitTerminationOrTimeout(30000)
 
     //Thread.sleep(20000)
     streamingSocket.stop()
@@ -70,6 +76,9 @@ class SparkStreaming {
     // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
     sparkStreamingContext.stop()
     println("Done.")
+
+    val analysis = new SentimentProcessor
+    analysis.analyzeFiles(tracking.head)
   }
 }
 

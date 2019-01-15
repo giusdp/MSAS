@@ -1,14 +1,34 @@
 package utils
 
+import java.io.File
+
 import scalax.chart.module.ChartFactories
 import scalax.chart.module.Charting._
 import org.jfree.data.category.DefaultCategoryDataset
-
+import scala.io.Source
 import scala.collection.mutable
 
 class SentimentProcessor  {
 
-  def makeSentimentsChart(title: String, sentiments: mutable.Map[String, Int]): Unit = {
+  def getListOfFiles(dir: String):List[File] = {
+    val d = new File(dir)
+    if (d.exists && d.isDirectory) {
+      d.listFiles.filter(_.isFile).toList
+    } else {
+      List[File]()
+    }
+  }
+
+  def analyzeFiles(hashtag: String) = {
+    val sentimentMap:mutable.Map[String, Int] = mutable.Map("POSITIVE" -> 0, "NEUTRAL" -> 0, "NEGATIVE" -> 0)
+    getListOfFiles("Sens/" + hashtag + "/").foreach(file => {
+      for (line <- Source.fromFile(file).getLines) {
+        sentimentMap.update(line, sentimentMap(line) + 1)
+      }})
+    makeSentimentsChart(hashtag, sentimentMap)
+  }
+
+  def makeSentimentsChart(hashtag: String, sentiments: mutable.Map[String, Int]): Unit = {
 
     val ds = new DefaultCategoryDataset
     ds.addValue(sentiments("POSITIVE"), "Positives", "Positives")
@@ -16,12 +36,9 @@ class SentimentProcessor  {
     ds.addValue(sentiments("NEGATIVE"), "Negatives", "Negatives")
 
     val chart = ChartFactories.BarChart(ds)
-    chart.title = title
+    chart.title = "Tweets about: " + hashtag
     //chart.show()
-    chart.saveAsPNG("chart.png")
+    chart.saveAsPNG("Charts/" + hashtag+".png")
 
   }
-
- // makeSentimentsChart("titolo", List(3,4,5))
-
 }
