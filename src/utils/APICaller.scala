@@ -12,11 +12,10 @@ class APICaller {
   val consumerToken = ConsumerToken(key = "9zAEZKIiGrofrdOdd9b8IYRzv", secret = "iUcWw9lg30UBshHOzXpnkwPJfL32IURcavHrmiwd4IupFncwaA")
   val accessToken = AccessToken(key = "1073564600312971266-3feLqOewNenRpFwxRsfmR1BdWQ6FRq", secret = "gpF7yx6VuiulCri02Un1cN2Ac300YxnqoKJQMt9VHZugy")
   val streamingClient:TwitterStreamingClient = TwitterStreamingClient(consumerToken, accessToken)
-  val tracking: Seq[String] = Seq("twitter")
 
   var socket: RedirectSocket = _
 
-  def startTwitterStream(): Unit = {
+  def startTwitterStream(tracking: Seq[String]): Unit = {
     if (socket == null) throw new Exception("APICaller: Connection was not opened (RedirectSocket is null)")
     var ts : Future[TwitterStream] = streamingClient.filterStatuses(tracks = tracking)(processTweet)
 
