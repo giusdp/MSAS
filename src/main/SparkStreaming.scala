@@ -40,8 +40,9 @@ class SparkStreaming {
     val dstream = streamingSocket.map(tweet => SentimentAnalyzer.mainSentiment(tweet).toString -> tweet)
 
     dstream.foreachRDD(rdd => rdd.foreach(c => {
-        directPar + c._1
-        // println(direct)
+        direct += c._1
+      println(c._1)
+      println(c._2)
     }))
     /*sentiments.foreachRDD(r => r.foreach( c => {
       println(c._1)
@@ -51,16 +52,17 @@ class SparkStreaming {
     }))*/
 
     ssc.start()
-    ssc.awaitTermination
     ac.startTwitterStream()
+    ssc.awaitTerminationOrTimeout(20000)
 
+    //Thread.sleep(20000)
+    //ssc.stop()
+    println("Print direct par:")
+    direct.foreach(x => println(x))
+    println(direct.head)
 
-
-    Thread.sleep(20000)
-    ssc.stop()
     ac.closeConnection()
-    println("elem")
-    directPar.foreach(x => println(x))
+    println("Closed.")
 
 
     // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
