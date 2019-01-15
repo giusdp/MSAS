@@ -25,6 +25,7 @@ class SparkStreaming {
     Logger.getLogger("akka").setLevel(Level.OFF)
 
     val sparkStreamingContext = new StreamingContext(conf, Seconds(1))
+
     val apiCaller: APICaller = new APICaller
     val counter = List("POSITIVE" ->0, "NEGATIVE" -> 0, "NEUTRAL" ->0)
 
@@ -38,7 +39,10 @@ class SparkStreaming {
 
     val streamingSocket = sparkStreamingContext.socketTextStream("localhost", 37644)
 
-    val dstream = streamingSocket.map(tweet => SentimentAnalyzer.getMainSentiment(tweet).toString -> tweet)
+    val dstream = streamingSocket.map(tweet => {
+      var s = SentimentAnalyzer.getMainSentiment(tweet)
+      s -> tweet
+    })
 
     dstream.foreachRDD(rdd => rdd.foreach(c => {
       if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
@@ -56,14 +60,17 @@ class SparkStreaming {
 
     apiCaller.closeConnection()
 
-    //streamingSocket.stop()
-    //sparkStreamingContext.stop()
-    sparkStreamingContext.stop(stopSparkContext = true, stopGracefully = true)
+    println("Stopping spark.")
+    streamingSocket.stop()
+    sparkStreamingContext.sparkContext.stop()
+    sparkStreamingContext.stop(true, true)
 
+    println("Spark stopped. Analysing sentiments.")
     val analysis = new SentimentProcessor
     analysis.analyzeFiles(tracking.head)
 
-    println("Done.")
+    println("Done. Chart made.")
+    sys.exit(0)
   }
 }
 

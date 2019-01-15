@@ -16,8 +16,9 @@ object SentimentAnalyzer {
   props.setProperty("annotators", "tokenize, ssplit, parse, sentiment")
   val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
 
-  def getMainSentiment(input: String): Sentiment = Option(input) match {
-    case Some(text) if !text.isEmpty => extractSentiment(text)
+  def getMainSentiment(input: String): String = Option(input) match {
+    case Some(text) if !text.isEmpty => extractSentiment(text).toString
+    //case _ => "EmptyTweet"
     //case _ => throw new IllegalArgumentException("SentimentAnalyzer.getMainSentiment: input can't be null or empty")
   }
 
