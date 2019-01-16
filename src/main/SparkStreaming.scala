@@ -2,6 +2,7 @@ package main
 
 import java.io._
 
+import org.apache.commons.io.FileUtils
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark._
 import org.apache.spark.streaming._
@@ -13,8 +14,8 @@ class SparkStreaming {
 
   def startStreaming(): Unit = {
 
-    val tracking: Seq[String] = Seq("TuesdayThoughts")
-    val d = new File("Sens/" + tracking.head)
+    val tracking: Seq[String] = Seq("twitter")
+    val d = new File(tracking.head)
     if (!(d.exists && d.isDirectory)) {
       if(d.mkdir()) println("Directory " + tracking.head + " created!")
     }
@@ -46,7 +47,7 @@ class SparkStreaming {
 
     dstream.foreachRDD(rdd => rdd.foreach(c => {
       if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
-        val file = new File("Sens/" + tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
+        val file = new File(tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(c._1)
         bw.close()
@@ -63,13 +64,18 @@ class SparkStreaming {
     println("Stopping spark.")
     streamingSocket.stop()
     sparkStreamingContext.sparkContext.stop()
-    sparkStreamingContext.stop(true, true)
+    sparkStreamingContext.stop(stopSparkContext = true, stopGracefully = true)
 
     println("Spark stopped. Analysing sentiments.")
     val analysis = new SentimentProcessor
     analysis.analyzeFiles(tracking.head)
 
-    println("Done. Chart made.")
+    println("Chart made.")
+
+    println("Deleting files.")
+
+
+    FileUtils.deleteDirectory(d)
     sys.exit(0)
   }
 }
