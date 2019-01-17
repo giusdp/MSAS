@@ -11,7 +11,7 @@ import utils.{APICaller, SentimentProcessor}
 
 class SparkStreaming {
 
-  def startStreaming(hashtag : String): Unit = {
+  def startStreaming(hashtag : String, duration: Long): Unit = {
 
     val tracking: Seq[String] = Seq(hashtag)
     val d = new File(tracking.head)
@@ -54,7 +54,7 @@ class SparkStreaming {
 
     sparkStreamingContext.start()
     apiCaller.startTwitterStream(tracking)
-    sparkStreamingContext.awaitTerminationOrTimeout(30000)
+    sparkStreamingContext.awaitTerminationOrTimeout(duration)
 
     apiCaller.closeConnection()
 
