@@ -1,5 +1,7 @@
 package main
 
+import com.typesafe.config.ConfigFactory
+
 object Main extends App {
 
   override def main(args: Array[String]): Unit = {
@@ -7,6 +9,8 @@ object Main extends App {
       println("Error: You have to give an hashtag! Exiting now.")
       return
     }
+
+    ConfigFactory.load("application.conf")
     val sparkTry = new SparkStreaming()
     sparkTry.startStreaming(args.head)
   }

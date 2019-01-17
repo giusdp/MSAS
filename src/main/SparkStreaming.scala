@@ -60,7 +60,7 @@ class SparkStreaming {
     println("Stopping spark.")
     streamingSocket.stop()
     sparkStreamingContext.sparkContext.stop()
-    sparkStreamingContext.stop(stopSparkContext = true, stopGracefully = true)
+    sparkStreamingContext.stop(stopSparkContext = false, stopGracefully = true)
 
     println("Spark stopped. Analysing sentiments.")
     val analysis = new SentimentProcessor
