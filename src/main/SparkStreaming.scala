@@ -42,12 +42,13 @@ class SparkStreaming {
     })
 
     dstream.foreachRDD(rdd => rdd.foreach(c => {
+      println(c)
       if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
         val file = new File(tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(c._1)
         bw.close()
-      } else println("Empty RDD")
+      } else println("Sentiment is empty! The tweet had problems.")
     })
     )
 

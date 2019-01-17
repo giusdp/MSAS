@@ -17,14 +17,19 @@ object SentimentAnalyzer {
   val pipeline: StanfordCoreNLP = new StanfordCoreNLP(props)
 
   def getMainSentiment(input: String): String = Option(input) match {
-    case Some(text) if text.length > 0 => extractSentiment(text).toString
+    case Some(text) => extractSentiment(text).toString
     //case _ => "EmptyTweet"
     //case _ => throw new IllegalArgumentException("SentimentAnalyzer.getMainSentiment: input can't be null or empty")
   }
 
   private def extractSentiment(text: String): Sentiment = {
-    val (_, sentiment) = extractSentiments(text).maxBy { case (sentence, _) => sentence.length }
-    sentiment
+    try {
+      val (_, sentiment) = extractSentiments(text).maxBy { case (sentence, _) => sentence.length }
+      sentiment
+    }
+    catch {
+      case _: Exception => Sentiment.toSentiment(-1)
+    }
   }
 
   def extractSentiments(text: String): List[(String, Sentiment)] = {
@@ -40,12 +45,13 @@ object SentimentAnalyzer {
 
 object Sentiment extends Enumeration {
   type Sentiment = Value
-  val POSITIVE, NEGATIVE, NEUTRAL = Value
+  val POSITIVE, NEGATIVE, NEUTRAL, EMPTY = Value
 
   def toSentiment(sentiment: Int): Sentiment = sentiment match {
     case x if x == 0 || x == 1 => Sentiment.NEGATIVE
     case 2 => Sentiment.NEUTRAL
     case x if x == 3 || x == 4 => Sentiment.POSITIVE
+    case -1 => Sentiment.EMPTY
   }
 
 }
