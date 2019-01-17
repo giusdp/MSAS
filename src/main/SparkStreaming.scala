@@ -23,7 +23,7 @@ class SparkStreaming {
     conf.setAppName("TSAS")
     conf.set("spark.testing.memory", "471859200")
     Logger.getLogger("org").setLevel(Level.OFF)
-    //Logger.getLogger("akka").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
 
     val sparkStreamingContext = new StreamingContext(conf, Seconds(1))
 
@@ -69,7 +69,6 @@ class SparkStreaming {
     println("Chart made.")
 
     println("Deleting files.")
-
 
     FileUtils.deleteDirectory(d)
     sys.exit(0)

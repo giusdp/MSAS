@@ -12,3 +12,4 @@ libraryDependencies += "com.danielasfregola" %% "twitter4s" % "5.5"
 
 libraryDependencies += "com.github.wookietreiber" %% "scala-chart" % "latest.integration"
 
+libraryDependencies += "com.typesafe.akka" %% "akka-stream" % "2.5.19"
