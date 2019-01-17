@@ -2,19 +2,18 @@ package main
 
 import java.io._
 
+import com.typesafe.config.ConfigFactory
 import org.apache.commons.io.FileUtils
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark._
 import org.apache.spark.streaming._
 import utils.{APICaller, SentimentProcessor}
 
-import scala.collection.mutable
-
 class SparkStreaming {
 
-  def startStreaming(): Unit = {
+  def startStreaming(hashtag : String): Unit = {
 
-    val tracking: Seq[String] = Seq("twitter")
+    val tracking: Seq[String] = Seq(hashtag)
     val d = new File(tracking.head)
     if (!(d.exists && d.isDirectory)) {
       if(d.mkdir()) println("Directory " + tracking.head + " created!")
@@ -22,19 +21,16 @@ class SparkStreaming {
 
     val conf = new SparkConf().setMaster("local[2]")
     conf.setAppName("TSAS")
+    conf.set("spark.testing.memory", "471859200")
     Logger.getLogger("org").setLevel(Level.OFF)
-    Logger.getLogger("akka").setLevel(Level.OFF)
+    //Logger.getLogger("akka").setLevel(Level.OFF)
 
     val sparkStreamingContext = new StreamingContext(conf, Seconds(1))
 
+    val config = ConfigFactory.load("twitter4s-streaming")
     val apiCaller: APICaller = new APICaller
-    val counter = List("POSITIVE" ->0, "NEGATIVE" -> 0, "NEUTRAL" ->0)
 
-    val direct:mutable.Buffer[String] = mutable.Buffer[String]()
-    val directPar = sparkStreamingContext.sparkContext.parallelize(direct)
     val r = scala.util.Random
-
-    val sentimentCounter = sparkStreamingContext.sparkContext.parallelize(counter, 3)
 
     apiCaller.openConnection()
 

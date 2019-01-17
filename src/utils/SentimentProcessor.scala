@@ -19,7 +19,7 @@ class SentimentProcessor  {
     }
   }
 
-  def analyzeFiles(hashtag: String) = {
+  def analyzeFiles(hashtag: String): Unit = {
     val sentimentMap:mutable.Map[String, Int] = mutable.Map("POSITIVE" -> 0, "NEUTRAL" -> 0, "NEGATIVE" -> 0)
     getListOfFiles(hashtag + "/").foreach(file => {
       for (line <- Source.fromFile(file).getLines) {
