@@ -6,15 +6,13 @@ import com.danielasfregola.twitter4s.entities.{AccessToken, ConsumerToken, Tweet
 import com.danielasfregola.twitter4s.http.clients.streaming.TwitterStream
 
 import scala.concurrent.Future
+import scala.io.Source
 
 class APICaller {
 
-  val consumerToken = ConsumerToken(key = "9zAEZKIiGrofrdOdd9b8IYRzv", secret = "iUcWw9lg30UBshHOzXpnkwPJfL32IURcavHrmiwd4IupFncwaA")
-  val accessToken = AccessToken(key = "1073564600312971266-3feLqOewNenRpFwxRsfmR1BdWQ6FRq", secret = "gpF7yx6VuiulCri02Un1cN2Ac300YxnqoKJQMt9VHZugy")
   var streamingClient:TwitterStreamingClient = _
   var ts : Future[TwitterStream] = _
   var socket: RedirectSocket = _
-
 
   /**
     * startTwitterStream:
@@ -25,6 +23,10 @@ class APICaller {
     */
   def startTwitterStream(tracking: Seq[String]): Unit = {
     if (socket == null) throw new Exception("APICaller: Connection was not opened (RedirectSocket is null)")
+
+    val keys = Source.fromFile("SECRET.txt").getLines.toList
+    val consumerToken = ConsumerToken(key = keys(0), secret = keys(1))
+    val accessToken = AccessToken(key = keys(2), secret = keys(3))
     streamingClient = TwitterStreamingClient(consumerToken, accessToken)
     ts = streamingClient.filterStatuses(tracks = tracking)(sendTweet)
 

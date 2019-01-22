@@ -3,6 +3,7 @@ package main
 import java.io._
 
 import org.apache.commons.io.FileUtils
+import org.apache.log4j.{Level, Logger}
 import org.apache.spark._
 import org.apache.spark.streaming._
 import utils.{APICaller, SentimentProcessor}
@@ -26,6 +27,9 @@ class SparkStreaming {
     if (!(d.exists && d.isDirectory)) {
       if(d.mkdir()) println("Directory " + tracking.head + " created!")
     }
+
+    Logger.getLogger("org").setLevel(Level.OFF)
+    Logger.getLogger("akka").setLevel(Level.OFF)
 
     println("Starting Spark.")
     val conf = new SparkConf().setMaster("local[2]")
