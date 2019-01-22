@@ -15,6 +15,7 @@ class SparkStreaming {
     * Inizializza Spark per lo streaming (SparkConf e StreamingContext).
     * Crea connessione con Twitter e la collega a Spark.
     * Ogni tweet ricevuto nel DStream viene collezionato per la Sentiment Analysis.
+    *
     * @param hashtag
     * @param duration
     */
@@ -26,11 +27,11 @@ class SparkStreaming {
       if(d.mkdir()) println("Directory " + tracking.head + " created!")
     }
 
+    println("Starting Spark.")
     val conf = new SparkConf().setMaster("local[2]")
-    conf.setAppName("TSAS")
+    conf.setAppName("TSA S/S")
     conf.set("spark.testing.memory", "471859200")
     val sparkStreamingContext = new StreamingContext(conf, Seconds(1))
-
     val apiCaller: APICaller = new APICaller
 
     val r = scala.util.Random
@@ -38,6 +39,7 @@ class SparkStreaming {
     val streamingSocket = sparkStreamingContext.socketTextStream("localhost", 37644)
     val dstream = streamingSocket.map(tweet => SentimentAnalyzer.getMainSentiment(tweet) -> tweet)
     dstream.foreachRDD(rdd => rdd.foreach(c => {
+      println(c)
       if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
         val file = new File(tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
         val bw = new BufferedWriter(new FileWriter(file))
@@ -47,6 +49,7 @@ class SparkStreaming {
     })
     )
 
+    println("Running.")
     sparkStreamingContext.start()
     apiCaller.startTwitterStream(tracking)
 
@@ -54,19 +57,20 @@ class SparkStreaming {
     sparkStreamingContext.awaitTerminationOrTimeout(duration)
     // ****** Closing ******
 
+    println("Stopping Spark.")
     apiCaller.closeConnection()
     streamingSocket.stop()
     sparkStreamingContext.sparkContext.stop()
     sparkStreamingContext.stop(stopSparkContext = false, stopGracefully = true)
 
     // ****** Sentiment Analysis ******
+    println("Analysing tweets.")
     val analysis = new SentimentProcessor
     analysis.analyzeFiles(tracking.head)
 
     // ****** Finished ******
     FileUtils.deleteDirectory(d)
+    println("Finished.")
     sys.exit(0)
   }
 }
-
-

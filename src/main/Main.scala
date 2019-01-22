@@ -7,7 +7,7 @@ object Main extends App {
   /**
     * Main:
     * L'applicazione prende in input 2 argomenti:
-    * - L'hashtag per filtrare i tweets da ricevere in streaming
+    * - L'hashtag per filtrare i tweets da ricevere in streaming;
     * - La durata dell'ascolto dello streaming in secondi, minuti o ore (s, m, h).
     * Carica il file di configurazione (application.conf) e lancia l'applicazione.
     *
@@ -39,4 +39,3 @@ object Main extends App {
     application.launchApp(args.head, time)
   }
 }
-
