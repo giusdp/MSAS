@@ -1,0 +1,5 @@
+1) Commentare /etc/spark/conf/log4j.properties con '#' le righe con DRFA stderr e stdout
+2) Caricare reference.conf (copia di application.conf) nella stessa cartella del jar
+3) Usare scala 2.11.12 e jdk 8 per creare il jar
+4) Specificare --class main.Main quando si lancia spark-submit (comando: spark-submit --class main.Main nomejar.jar)
+5) Creare cartella Charts prima di lanciare 

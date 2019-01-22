@@ -4,7 +4,17 @@ import com.typesafe.config.ConfigFactory
 
 object Main extends App {
 
+  /**
+    * Main:
+    * L'applicazione prende in input 2 argomenti:
+    * - L'hashtag per filtrare i tweets da ricevere in streaming
+    * - La durata dell'ascolto dello streaming in secondi, minuti o ore (s, m, h).
+    * Carica il file di configurazione (application.conf) e lancia l'applicazione.
+    *
+    * @param args
+    */
   override def main(args: Array[String]): Unit = {
+
     if (! (args.length == 2)) {
       println("Error: You have to give a hashtag and the time as #{s,m,h}. Exiting now.")
       return
@@ -25,8 +35,8 @@ object Main extends App {
     println("Running with hashtag " + args.head + " for "+ args.last.dropRight(1) + " "+ unit + ".")
 
     ConfigFactory.load("application.conf")
-    val sparkTry = new SparkStreaming()
-    sparkTry.startStreaming(args.head, time)
+    val application = new SparkStreaming()
+    application.launchApp(args.head, time)
   }
 }
 

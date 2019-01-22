@@ -3,6 +3,7 @@ package utils
 import java.io.{BufferedReader, InputStreamReader, PrintWriter}
 import java.net.{ServerSocket, Socket}
 
+
 class RedirectSocket {
 
   var serverSocket: ServerSocket = _
@@ -17,14 +18,17 @@ class RedirectSocket {
 
     serverSocket = new ServerSocket(37644)
 
-    creationThread = new Thread(() => {
-      println("RedirectSocket: Thread lanciato in parallelo. In attesa di clients...")
-      clientSocket = serverSocket.accept()
-      println("RedirectSocket: Client accettato.")
-      out = new PrintWriter(clientSocket.getOutputStream, true)
-      in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream))
-      cAddress = clientSocket.getInetAddress.toString
+    creationThread = new Thread(new Runnable {
+      override def run(): Unit = {
+        println("RedirectSocket: Thread lanciato in parallelo. In attesa di clients...")
+        clientSocket = serverSocket.accept()
+        println("RedirectSocket: Client accettato.")
+        out = new PrintWriter(clientSocket.getOutputStream, true)
+        in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream))
+        cAddress = clientSocket.getInetAddress.toString
+      }
     })
+
 
     creationThread.start()
   }

@@ -1,0 +1,1 @@
+spark-submit --driver-java-options='-Dspark.yarn.app.container.log.dir=/mnt/var/log/hadoop'
