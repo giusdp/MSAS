@@ -1,85 +1,80 @@
 package main
 
-import java.util.concurrent.atomic.AtomicInteger
-
-import org.apache.commons.lang.mutable.Mutable
-import org.apache.spark._
-import org.apache.spark.streaming._
-import utils.APICaller
-import utils.SentimentProcessor
-import org.apache.log4j.Logger
-import org.apache.log4j.Level
 import java.io._
 
-import scala.collection.mutable
+import org.apache.commons.io.FileUtils
+import org.apache.log4j.{Level, Logger}
+import org.apache.spark._
+import org.apache.spark.streaming._
+import utils.{APICaller, SentimentProcessor}
 
 class SparkStreaming {
 
-  def startStreaming(): Unit = {
+  /**
+    * launchApp:
+    * Prepara la cartella per accogliere i sentimenti derivanti dall'analisi dei tweets.
+    * Inizializza Spark per lo streaming (SparkConf e StreamingContext).
+    * Crea connessione con Twitter e la collega a Spark.
+    * Ogni tweet ricevuto nel DStream viene collezionato per la Sentiment Analysis.
+    *
+    * @param hashtag
+    * @param duration
+    */
+  def launchApp(hashtag : String, duration: Long): Unit = {
 
-    val tracking: Seq[String] = Seq("NATO")
-    val d = new File("Sens/" + tracking.head)
+    val tracking: Seq[String] = Seq(hashtag)
+    val d = new File(tracking.head)
     if (!(d.exists && d.isDirectory)) {
       if(d.mkdir()) println("Directory " + tracking.head + " created!")
     }
 
-    val conf = new SparkConf().setMaster("local[2]")
-    conf.setAppName("TSAS")
     Logger.getLogger("org").setLevel(Level.OFF)
     Logger.getLogger("akka").setLevel(Level.OFF)
 
-    // val sentimentPlotting = new SentimentProcessor
-    // val sentimentCollection:mutable.Map[String, Int] = scala.collection.mutable.Map("POSITIVE" -> 0, "NEGATIVE" -> 0, "NEUTRAL" -> 0)
-
+    println("Starting Spark.")
+    val conf = new SparkConf().setMaster("local[2]")
+    conf.setAppName("TSA S/S")
+    conf.set("spark.testing.memory", "471859200")
     val sparkStreamingContext = new StreamingContext(conf, Seconds(1))
     val apiCaller: APICaller = new APICaller
-    val counter = List("POSITIVE" ->0, "NEGATIVE" -> 0, "NEUTRAL" ->0)
-    //
-    val direct:mutable.Buffer[String] = mutable.Buffer[String]()
-    val directPar = sparkStreamingContext.sparkContext.parallelize(direct)
+
     val r = scala.util.Random
-    //
-    val sentimentCounter = sparkStreamingContext.sparkContext.parallelize(counter, 3)
-
     apiCaller.openConnection()
-
     val streamingSocket = sparkStreamingContext.socketTextStream("localhost", 37644)
-
-    val dstream = streamingSocket.map(tweet => SentimentAnalyzer.mainSentiment(tweet).toString -> tweet)
-
+    val dstream = streamingSocket.map(tweet => SentimentAnalyzer.getMainSentiment(tweet) -> tweet)
     dstream.foreachRDD(rdd => rdd.foreach(c => {
+      println(c)
       if (c._1 == "POSITIVE" || c._1 == "NEGATIVE" || c._1 == "NEUTRAL") {
-        val file = new File("Sens/" + tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
+        val file = new File(tracking.head + "/Sentiment" + r.nextInt(1000000000).toString)
         val bw = new BufferedWriter(new FileWriter(file))
         bw.write(c._1)
         bw.close()
-      } else println("Empty RDD")
+      }
     })
     )
-    /*sentiments.foreachRDD(r => r.foreach( c => {
-      println(c._1)
-      val sentiment = c._2.toString
-      println(sentiment)
-      sentimentCollection.update(sentiment, sentimentCollection(sentiment) + 1)
-    }))*/
 
-    //dstream.saveAsTextFiles("dstreamTwitter", "txt")
-
+    println("Running.")
     sparkStreamingContext.start()
     apiCaller.startTwitterStream(tracking)
-    sparkStreamingContext.awaitTerminationOrTimeout(30000)
 
-    //Thread.sleep(20000)
-    streamingSocket.stop()
+    // ****** Running ******
+    sparkStreamingContext.awaitTerminationOrTimeout(duration)
+    // ****** Closing ******
+
+    println("Stopping Spark.")
     apiCaller.closeConnection()
+    streamingSocket.stop()
+    sparkStreamingContext.sparkContext.stop()
+    sparkStreamingContext.stop(stopSparkContext = false, stopGracefully = true)
 
-    // sentimentPlotting.makeSentimentsChart("Title 1", sentimentCollection)
-    sparkStreamingContext.stop()
-    println("Done.")
-
+    // ****** Sentiment Analysis ******
+    println("Analysing tweets.")
     val analysis = new SentimentProcessor
     analysis.analyzeFiles(tracking.head)
+
+    // ****** Finished ******
+    FileUtils.deleteDirectory(d)
+    println("Finished.")
+    sys.exit(0)
   }
 }
-
-
